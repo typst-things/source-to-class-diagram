@@ -1,0 +1,12 @@
+[package]
+name = "cetz-classuml"
+version = "0.1.0"
+compiler = "0.14.2"
+entrypoint = "src/lib.typ"
+authors = ["Leandro"]
+license = "MIT"
+description = "UML Class Diagrams for Typst, built on CeTZ. Supports PlantUML syntax with pluggable grammars (Java, C#)."
+repository = ""
+categories = ["visualization", "components"]
+keywords = ["uml", "class-diagram", "plantuml", "cetz", "diagram"]
+exclude = ["tests/", "docs/"]

@@ -1,0 +1,36 @@
+@startuml
+abstract class Animal {
+  - String nome
+  - int idade
+  + String getNome()
+  + void setNome(String nome)
+  + {abstract} void emitirSom()
+}
+
+class Cachorro {
+  - String raca
+  + void latir()
+}
+
+class Gato {
+  - boolean domestico
+  + void miar()
+}
+
+interface Alimentavel {
+  + void alimentar()
+  + boolean estaComFome()
+}
+
+enum Porte {
+  PEQUENO
+  MEDIO
+  GRANDE
+}
+
+Animal <|-- Cachorro
+Animal <|-- Gato
+Cachorro ..|> Alimentavel
+Gato ..|> Alimentavel
+Cachorro --> Porte
+@enduml
