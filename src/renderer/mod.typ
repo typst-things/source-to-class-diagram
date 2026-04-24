@@ -39,7 +39,7 @@
     for rel in ir.relations {
       let from-pos = positions.at(rel.from, default: (0, 0))
       let to-pos = positions.at(rel.to, default: (0, 0))
-      relations.draw-relation(rel, from-pos, to-pos, the-theme)
+      relations.draw-relation(rel, from-pos, to-pos, the-theme, positions)
     }
   })
 }

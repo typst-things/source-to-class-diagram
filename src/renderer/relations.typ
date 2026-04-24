@@ -38,15 +38,15 @@
   association: (
     dash: none,
     start-mark: none,
-    end-mark: ">",
-    end-fill: auto,
+    end-mark: "straight",
+    end-fill: none,
     start-fill: none,
   ),
   dependency: (
     dash: "dashed",
     start-mark: none,
-    end-mark: ">",
-    end-fill: auto,
+    end-mark: "straight",
+    end-fill: none,
     start-fill: none,
   ),
   link: (
@@ -65,61 +65,39 @@
   ),
 )
 
-/// Compute best anchors using 8-direction mapping.
-/// Returns: (from-anchor-suffix, to-anchor-suffix)
-#let _compute-anchors(from-pos, to-pos) = {
-  let dx = to-pos.at(0) - from-pos.at(0)
-  let dy = to-pos.at(1) - from-pos.at(1)
-  let adx = calc.abs(dx)
-  let ady = calc.abs(dy)
-
-  // Determine direction ratio
-  let ratio = if adx > 0.01 { ady / adx } else { 100.0 }
-
-  if ratio > 0.8 {
-    // Primarily vertical
-    if dy > 0 {
-      ("north", "south")
-    } else {
-      ("south", "north")
-    }
-  } else if ratio < 0.5 {
-    // Primarily horizontal
-    if dx > 0 {
-      ("east", "west")
-    } else {
-      ("west", "east")
-    }
-  } else {
-    // Diagonal — use corner anchors
-    if dx > 0 and dy > 0 {
-      ("north-east", "south-west")
-    } else if dx > 0 and dy < 0 {
-      ("south-east", "north-west")
-    } else if dx < 0 and dy > 0 {
-      ("north-west", "south-east")
-    } else {
-      ("south-west", "north-east")
-    }
-  }
-}
-
 /// Draw a single UML relation in the CeTZ canvas.
 ///
 /// - rel (dict): A uml-relation dictionary
 /// - from-pos (tuple): (x, y) position of the source class
 /// - to-pos (tuple): (x, y) position of the target class
 /// - theme (dict): The active theme
-#let draw-relation(rel, from-pos, to-pos, theme) = {
+#let draw-relation(rel, from-pos, to-pos, theme, positions) = {
   let style = _relation-styles.at(
     rel.type,
     default: _relation-styles.at("link"),
   )
 
-  // Compute anchors
-  let (from-anchor, to-anchor) = _compute-anchors(from-pos, to-pos)
-  let from-point = rel.from + "." + from-anchor
-  let to-point = rel.to + "." + to-anchor
+  // Detect if there are physical obstacle classes between the endpoints
+  let is-horizontal = calc.abs(from-pos.at(1) - to-pos.at(1)) < 0.1
+  let bridge = false
+  
+  if is-horizontal {
+    let min-x = calc.min(from-pos.at(0), to-pos.at(0))
+    let max-x = calc.max(from-pos.at(0), to-pos.at(0))
+    for (name, pos) in positions {
+      if name != rel.from and name != rel.to {
+        if calc.abs(pos.at(1) - from-pos.at(1)) < 0.1 {
+          if pos.at(0) > min-x + 0.1 and pos.at(0) < max-x - 0.1 {
+            bridge = true
+          }
+        }
+      }
+    }
+  }
+
+  // Use base node names for native clipping, or top border for bridges
+  let from-point = if bridge { rel.from + ".north" } else { rel.from }
+  let to-point = if bridge { rel.to + ".north" } else { rel.to }
 
   // Build stroke
   let rel-stroke = if style.dash != none {
@@ -149,32 +127,42 @@
     mark-cfg.insert("stroke", (paint: theme.relation.color, thickness: theme.relation.stroke-thickness))
   }
 
+  let mid-x = (from-pos.at(0) + to-pos.at(0)) / 2
+  let mid-y = (from-pos.at(1) + to-pos.at(1)) / 2
+  let bridge-y = mid-y + 2.5 // push arc up by 2.5 units
+
   // Draw the line
-  if mark-cfg.len() > 0 {
-    cetz.draw.line(
-      from-point,
-      to-point,
-      stroke: rel-stroke,
-      mark: mark-cfg,
-    )
+  if bridge {
+    if mark-cfg.len() > 0 {
+      cetz.draw.bezier-through(from-point, (mid-x, bridge-y), to-point, stroke: rel-stroke, mark: mark-cfg)
+    } else {
+      cetz.draw.bezier-through(from-point, (mid-x, bridge-y), to-point, stroke: rel-stroke)
+    }
   } else {
-    cetz.draw.line(
-      from-point,
-      to-point,
-      stroke: rel-stroke,
-    )
+    if mark-cfg.len() > 0 {
+      cetz.draw.line(
+        from-point,
+        to-point,
+        stroke: rel-stroke,
+        mark: mark-cfg,
+      )
+    } else {
+      cetz.draw.line(
+        from-point,
+        to-point,
+        stroke: rel-stroke,
+      )
+    }
   }
 
   // --- Labels and cardinalities ---
 
   // Midpoint for label
   if rel.label != none {
-    let mid-x = (from-pos.at(0) + to-pos.at(0)) / 2
-    let mid-y = (from-pos.at(1) + to-pos.at(1)) / 2
-    // Offset label slightly above the line
     let offset-y = 0.3
+    let target-y = if bridge { bridge-y + offset-y } else { mid-y + offset-y }
     cetz.draw.content(
-      (mid-x, mid-y + offset-y),
+      (mid-x, target-y),
       anchor: "south",
       text(size: theme.relation.label-size, style: "italic")[#rel.label],
     )
