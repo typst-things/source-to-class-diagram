@@ -152,13 +152,15 @@
   // Draw the line
   if mark-cfg.len() > 0 {
     cetz.draw.line(
-      from-point, to-point,
+      from-point,
+      to-point,
       stroke: rel-stroke,
       mark: mark-cfg,
     )
   } else {
     cetz.draw.line(
-      from-point, to-point,
+      from-point,
+      to-point,
       stroke: rel-stroke,
     )
   }

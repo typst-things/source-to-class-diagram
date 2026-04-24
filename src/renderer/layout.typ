@@ -7,7 +7,7 @@
 /// Estimate the width of a class box in CeTZ units (~1 unit ≈ 1cm).
 /// Based on the longest text line in the class.
 #let _estimate-width(cls) = {
-  let max-len = cls.name.len() + 4  // name + some padding for bold
+  let max-len = cls.name.len() + 4 // name + some padding for bold
 
   // Check stereotype / type label
   if cls.stereotype != none { max-len = calc.max(max-len, cls.stereotype.len() + 4) }
@@ -16,13 +16,13 @@
   }
 
   for m in cls.members {
-    let member-len = 2  // visibility symbol + space
+    let member-len = 2 // visibility symbol + space
     member-len += m.name.len()
     if m.kind == "method" {
-      member-len += 2  // parentheses
+      member-len += 2 // parentheses
       if m.params != none { member-len += m.params.len() }
     }
-    if m.return-type != none { member-len += m.return-type.len() + 2 }  // ": Type"
+    if m.return-type != none { member-len += m.return-type.len() + 2 } // ": Type"
     if member-len > max-len { max-len = member-len }
   }
 
@@ -33,14 +33,14 @@
 /// Estimate the height of a class box in CeTZ units.
 /// Based on the number of members.
 #let _estimate-height(cls) = {
-  let lines = 1.0  // header (name)
+  let lines = 1.0 // header (name)
   if cls.stereotype != none or cls.type != "class" { lines += 0.6 }
   if cls.generics != none { lines += 0.4 }
 
   let fields = cls.members.filter(m => m.kind == "field")
   let methods = cls.members.filter(m => m.kind == "method")
 
-  if fields.len() > 0 { lines += fields.len() + 0.3 }  // +0.3 for separator
+  if fields.len() > 0 { lines += fields.len() + 0.3 } // +0.3 for separator
   if methods.len() > 0 { lines += methods.len() + 0.3 }
   if fields.len() == 0 and methods.len() == 0 { lines += 0.3 }
 
@@ -66,8 +66,8 @@
   if classes.len() == 0 { return (:) }
 
   // --- 1. Build hierarchy ---
-  let parent-map = (:)  // child → array of parents
-  let child-map = (:)   // parent → array of children
+  let parent-map = (:) // child → array of parents
+  let child-map = (:) // parent → array of children
 
   for rel in relations {
     if rel.type == "inheritance" or rel.type == "implementation" {
@@ -92,7 +92,8 @@
   let queue = roots.map(r => (name: r, level: 0))
   let visited = ()
 
-  for entry in queue {
+  while queue.len() > 0 {
+    let entry = queue.remove(0)
     if entry.name not in visited {
       visited.push(entry.name)
       levels.insert(entry.name, entry.level)
@@ -122,7 +123,7 @@
   }
 
   // Actual spacing: at least (max-box-size + comfortable gap)
-  let gap-x = 2.0  // minimum gap between boxes
+  let gap-x = 2.0 // minimum gap between boxes
   let gap-y = 2.0
   let actual-sx = calc.max(spacing.x, max-width + gap-x)
   let actual-sy = calc.max(spacing.y, max-height + gap-y)

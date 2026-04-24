@@ -1,5 +1,9 @@
-#import "../src/lib.typ": class-diagram
+#import "../src/lib.typ": setup-classuml
 
+#show: setup-classuml
+
+#set page(margin: 1.5cm)
+#set text(font: "Segoe UI")
 = Teste Gramática: PlantUML
 
 ```class-diagram-plantuml

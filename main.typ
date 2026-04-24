@@ -71,7 +71,7 @@ public interface Alimentavel {
 }
 ```
 
-== Exemplo 3: Sintaxe C#
+== Exemplo 3: Sintaxe C
 
 ```class-diagram-csharp
 public abstract class Animal {
