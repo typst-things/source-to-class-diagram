@@ -76,7 +76,7 @@
   // Determine direction ratio
   let ratio = if adx > 0.01 { ady / adx } else { 100.0 }
 
-  if ratio > 2.0 {
+  if ratio > 0.8 {
     // Primarily vertical
     if dy > 0 {
       ("north", "south")
