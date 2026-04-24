@@ -1,5 +1,6 @@
 #import "../src/lib.typ": setup-classuml
-#set page(width: auto)
+//#set page(width: auto)
+#set page(paper: "a4")
 #show: setup-classuml
 
 #set page(margin: 1.5cm)
@@ -8,34 +9,17 @@
 
 ```class-diagram-plantuml
 @startuml
-abstract class Animal {
+class A{
   - String nome
   - int idade
+  - B n
+  + A()
   + String getNome()
   + {abstract} void emitirSom()
 }
+A --* C
+A <|-- D
 
-class Cachorro {
-  - String raca
-}
-
-interface Alimentavel {
-  + void alimentar()
-}
-
-class B{
-  + void comer()
-}
-
-class D{
-  + void comer()
-}
-
-Animal <|-- Cachorro
-Cachorro ..|> Alimentavel
-B --o Animal
-D --* Cachorro
-H ..> J
 @enduml
 ```
 

@@ -1,37 +1,18 @@
-#import "../src/lib.typ": class-diagram
+#import "../src/lib.typ": setup-classuml
+//#set page(paper: "a4")
+#set page(width: auto)
+#show: setup-classuml
 
 = Teste Gramática: Java
 
-```class-diagram-java
-public abstract class Animal {
-  private String nome;
-  private int idade;
-  public String getNome() { }
-  public abstract void emitirSom();
-}
+#let src = (
+  read("java/Animal.java"),
+  read("java/Cachorro.java"),
+  read("java/Alimentavel.java"),
+  read("java/Gato.java"),
+  read("java/Coleira.java"),
+  read("java/Dono.java"),
+  read("java/Brinquedo.java"),
+).join("\n\n")
 
-public class Cachorro extends Animal {
-  private String raca;
-  private Coleira coleira;
-
-  public Cachorro(Dono dono) {
-    this.dono = dono;
-  }
-
-  public void latir() {
-    Brinquedo b = new Brinquedo();
-  }
-}
-
-public interface Alimentavel {
-  void alimentar();
-}
-
-public class Gato extends Animal implements Alimentavel {
-  private boolean domestico;
-}
-
-public class Coleira {}
-public class Dono {}
-public class Brinquedo {}
-```
+#raw(src, block: true, lang: "class-diagram-java")

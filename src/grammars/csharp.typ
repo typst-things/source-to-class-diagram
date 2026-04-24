@@ -22,9 +22,38 @@
 
     // --- Inside a class body ---
     if brace-depth > 0 {
+      let depth-before = brace-depth
       for ch in line.clusters() {
         if ch == "{" { brace-depth += 1 }
         if ch == "}" { brace-depth -= 1 }
+      }
+
+      // Detect Exception Throws
+      let throw-matches = line.matches(regex("throw\\s+new\\s+([A-Z][\\w.]*)"))
+      let throw-targets = ()
+      for tm in throw-matches {
+        let target = tm.captures.at(0)
+        throw-targets.push(target)
+        relations.push(ir.uml-relation(
+          from: current-class.name,
+          to: target,
+          type: "dependency"
+        ))
+      }
+
+      // Detect Composition
+      if line.contains(" new ") {
+        let new-matches = line.matches(regex("new\\s+([A-Z][\\w.]*)\\s*\\("))
+        for nm in new-matches {
+          let target = nm.captures.at(0)
+          if (target not in throw-targets) and (not putils.is-primitive-type(target)) {
+            relations.push(ir.uml-relation(
+              from: current-class.name,
+              to: target,
+              type: "composition"
+            ))
+          }
+        }
       }
 
       if brace-depth == 0 {
@@ -34,7 +63,7 @@
           current-class = none
           current-members = ()
         }
-      } else {
+      } else if depth-before == 1 {
         // Parse Member (Field or Method or Constructor or Property)
         let rest = line
         let visibility = "package"
@@ -65,21 +94,6 @@
         let is-method = rest.contains("(")
 
         if is-method {
-          // Detect Composition
-          if line.contains(" new ") {
-            let new-match = line.match(regex("new\\s+([A-Z][\\w.]*)\\s*\\("))
-            if new-match != none {
-              let target = new-match.captures.at(0)
-              if not putils.is-primitive-type(target) {
-                relations.push(ir.uml-relation(
-                  from: current-class.name,
-                  to: target,
-                  type: "composition"
-                ))
-              }
-            }
-          }
-
           let pre-paren-match = rest.match(regex("^([^(]+)"))
           if pre-paren-match != none {
             let pre-paren = pre-paren-match.text.trim()
