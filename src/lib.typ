@@ -15,9 +15,22 @@
 // =============================================================================
 
 /// Parse source code and render the class diagram.
-#let _render-diagram(source, grammar: "plantuml", theme: auto, spacing: (x: 4.0, y: 3.5)) = {
+#let _render-diagram(source, grammar: "plantuml", theme: auto, spacing: (x: 4.0, y: 3.5), fit: true) = {
   let diagram-ir = parser.parse(source, grammar: grammar)
-  renderer.render(diagram-ir, theme: theme, spacing: spacing)
+  let result = renderer.render(diagram-ir, theme: theme, spacing: spacing)
+  if fit {
+    layout(bounds => context {
+      let size = measure(result)
+      if size.width > bounds.width {
+        let factor = bounds.width / size.width
+        scale(x: factor * 100%, y: factor * 100%, origin: top + left, result)
+      } else {
+        result
+      }
+    })
+  } else {
+    result
+  }
 }
 
 // =============================================================================
@@ -41,16 +54,17 @@
 #let setup-classuml(
   theme: auto,
   spacing: (x: 4.0, y: 3.5),
+  fit: true,
   doc,
 ) = {
   show raw.where(lang: "class-diagram-plantuml"): it => {
-    _render-diagram(it.text, grammar: "plantuml", theme: theme, spacing: spacing)
+    _render-diagram(it.text, grammar: "plantuml", theme: theme, spacing: spacing, fit: fit)
   }
   show raw.where(lang: "class-diagram-java"): it => {
-    _render-diagram(it.text, grammar: "java", theme: theme, spacing: spacing)
+    _render-diagram(it.text, grammar: "java", theme: theme, spacing: spacing, fit: fit)
   }
   show raw.where(lang: "class-diagram-csharp"): it => {
-    _render-diagram(it.text, grammar: "csharp", theme: theme, spacing: spacing)
+    _render-diagram(it.text, grammar: "csharp", theme: theme, spacing: spacing, fit: fit)
   }
   doc
 }
@@ -70,8 +84,9 @@
   grammar: "plantuml",
   theme: auto,
   spacing: (x: 4.0, y: 3.5),
+  fit: true,
 ) = {
-  _render-diagram(source, grammar: grammar, theme: theme, spacing: spacing)
+  _render-diagram(source, grammar: grammar, theme: theme, spacing: spacing, fit: fit)
 }
 
 // =============================================================================
