@@ -24,14 +24,14 @@
   composition: (
     dash: none,
     start-mark: "diamond",
-    end-mark: none,
+    end-mark: "straight",
     start-fill: black,
     end-fill: none,
   ),
   aggregation: (
     dash: none,
     start-mark: "diamond",
-    end-mark: none,
+    end-mark: "straight",
     start-fill: white,
     end-fill: none,
   ),
@@ -81,7 +81,7 @@
   // Detect if there are physical obstacle classes between the endpoints
   let is-horizontal = calc.abs(from-pos.at(1) - to-pos.at(1)) < 0.1
   let bridge = false
-  
+
   if is-horizontal {
     let min-x = calc.min(from-pos.at(0), to-pos.at(0))
     let max-x = calc.max(from-pos.at(0), to-pos.at(0))
@@ -120,7 +120,8 @@
   }
 
   if mark-cfg.len() > 0 {
-    mark-cfg.insert("size", 0.35)
+    mark-cfg.insert("width", 0.45)
+    mark-cfg.insert("length", 0.45)
     mark-cfg.insert("stroke", (paint: theme.relation.color, thickness: theme.relation.stroke-thickness))
   }
 
@@ -193,7 +194,7 @@
   let to-coord = to-point
   let shift-x = 0.0
   let shift-y = 0.0
-  
+
   if use-curve and is-bidi {
     let shift-amount = if rel.from < rel.to { 0.35 } else { -0.35 }
     if bridge {
