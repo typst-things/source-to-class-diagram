@@ -1,5 +1,5 @@
 // =============================================================================
-// cetz-classuml — C# Grammar
+// source-to-class-diagram — C# Grammar
 // =============================================================================
 // Relation inference rules (same as Java grammar):
 //   1. A non-primitive field/property → association  (label = member name)

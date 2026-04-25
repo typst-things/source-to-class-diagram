@@ -1,7 +1,7 @@
 #import "../src/lib.typ": setup-classuml
 
-//#set page(paper: "a4", flipped: true)
-#set page(width: auto)
+#set page(paper: "a4", flipped: true)
+//#set page(width: auto)
 //#set page(width: 10cm)
 #show: setup-classuml
 

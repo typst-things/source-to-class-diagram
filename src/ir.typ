@@ -1,5 +1,5 @@
 // =============================================================================
-// cetz-classuml — Intermediate Representation (IR)
+// source-to-class-diagram — Intermediate Representation (IR)
 // =============================================================================
 // All grammar parsers produce this IR. The renderer consumes it.
 // This decouples parsing from rendering completely.

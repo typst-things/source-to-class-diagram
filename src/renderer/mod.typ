@@ -1,5 +1,5 @@
 // =============================================================================
-// cetz-classuml — Renderer Orchestrator
+// source-to-class-diagram — Renderer Orchestrator
 // =============================================================================
 // Takes an IR and produces a CeTZ canvas with the class diagram.
 

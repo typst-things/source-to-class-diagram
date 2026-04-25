@@ -1,7 +1,7 @@
 // =============================================================================
-// cetz-classuml — Main Entry Point
+// source-to-class-diagram — Main Entry Point
 // =============================================================================
-// Public API for the cetz-classuml package.
+// Public API for the source-to-class-diagram package.
 // Provides both show-rule based (code fences) and function-based APIs.
 
 #import "deps.typ": cetz

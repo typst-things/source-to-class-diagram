@@ -1,31 +1,42 @@
 // =============================================================================
-// cetz-classuml — Parser Utilities
+// source-to-class-diagram — Parser Utilities
 // =============================================================================
 // Shared string-parsing helpers used by all grammars.
 
-/// PlantUML visibility symbol → IR visibility value.
-#let parse-visibility-symbol(char) = {
-  if char == "+" { "public" }
-  else if char == "-" { "private" }
-  else if char == "#" { "protected" }
-  else if char == "~" { "package" }
-  else { none }
-}
-
 /// Java/C# visibility keyword → IR visibility value.
 #let parse-visibility-keyword(word) = {
-  if word == "public" { "public" }
-  else if word == "private" { "private" }
-  else if word == "protected" { "protected" }
-  else { none }
+  if word == "public" { "public" } else if word == "private" { "private" } else if word == "protected" {
+    "protected"
+  } else { none }
 }
 
 /// Check if a type name is a Java/C# primitive (won't generate a relation).
 #let is-primitive-type(type-name) = {
   let primitives = (
-    "int", "float", "double", "boolean", "bool", "char", "byte", "short", "long",
-    "void", "String", "string", "Integer", "Float", "Double", "Boolean", "Character",
-    "Byte", "Short", "Long", "Object", "object", "var", "dynamic",
+    "int",
+    "float",
+    "double",
+    "boolean",
+    "bool",
+    "char",
+    "byte",
+    "short",
+    "long",
+    "void",
+    "String",
+    "string",
+    "Integer",
+    "Float",
+    "Double",
+    "Boolean",
+    "Character",
+    "Byte",
+    "Short",
+    "Long",
+    "Object",
+    "object",
+    "var",
+    "dynamic",
   )
   type-name in primitives
 }
@@ -53,38 +64,6 @@
 #let parse-generics(text) = {
   let m = text.match(regex("<([^>]+)>"))
   if m != none { m.captures.at(0) } else { none }
-}
-
-/// Detect which PlantUML relation operator is present in a line.
-/// Returns a dictionary with (op, type, swap) or none.
-/// The operators are checked longest-first to avoid false positives.
-#let detect-relation-operator(line) = {
-  // Each entry: (operator-string, ir-type, swap-from-to)
-  // swap=true means the "mark" is on the left side → from=right, to=left
-  let operators = (
-    (op: "<|--",  type: "inheritance",    swap: true),
-    (op: "--|>",  type: "inheritance",    swap: false),
-    (op: "<|..",  type: "implementation", swap: true),
-    (op: "..|>",  type: "implementation", swap: false),
-    (op: "*--",   type: "composition",    swap: false),
-    (op: "--*",   type: "composition",    swap: true),
-    (op: "o--",   type: "aggregation",    swap: false),
-    (op: "--o",   type: "aggregation",    swap: true),
-    (op: "-->",   type: "association",    swap: false),
-    (op: "<--",   type: "association",    swap: true),
-    (op: "..>",   type: "dependency",     swap: false),
-    (op: "<..",   type: "dependency",     swap: true),
-    (op: "--",    type: "link",           swap: false),
-    (op: "..",    type: "dashed-link",    swap: false),
-  )
-
-  let result = none
-  for entry in operators {
-    if result == none and line.contains(entry.op) {
-      result = entry
-    }
-  }
-  result
 }
 
 /// Parse cardinality and class name from a relation side.

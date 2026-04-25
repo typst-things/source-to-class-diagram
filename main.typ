@@ -5,7 +5,7 @@
 #set page(paper: "a4")
 #set text(font: "Segoe UI")
 
-= cetz-classuml — Demonstração
+= source-to-class-diagram — Demonstração
 
 == Exemplo 1: Sintaxe Java
 

@@ -1,5 +1,5 @@
 // =============================================================================
-// cetz-classuml — Parser Orchestrator
+// source-to-class-diagram — Parser Orchestrator
 // =============================================================================
 // Routes source text through the appropriate grammar parser.
 
@@ -10,7 +10,7 @@
 ///
 /// - source (str): The source text to parse
 /// - grammar (str or function): Grammar name or custom parse function
-#let parse(source, grammar: "plantuml") = {
+#let parse(source, grammar: "java") = {
   let parse-fn = grammars.resolve-grammar(grammar)
   let ir = parse-fn(source)
 

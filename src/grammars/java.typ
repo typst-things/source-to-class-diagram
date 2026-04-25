@@ -1,5 +1,5 @@
 // =============================================================================
-// cetz-classuml — Java Grammar
+// source-to-class-diagram — Java Grammar
 // =============================================================================
 // Relation inference rules:
 //   1. A non-primitive field  → association  (label = field name)

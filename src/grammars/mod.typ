@@ -1,5 +1,5 @@
 // =============================================================================
-// cetz-classuml — Grammar Registry
+// source-to-class-diagram — Grammar Registry
 // =============================================================================
 // Central registry of available grammars.
 // Each grammar must export a `parse(source) -> IR` function.

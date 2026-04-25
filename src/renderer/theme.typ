@@ -1,5 +1,5 @@
 // =============================================================================
-// cetz-classuml — Theme System
+// source-to-class-diagram — Theme System
 // =============================================================================
 // Visual theming for class diagrams.
 
