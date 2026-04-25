@@ -4,15 +4,13 @@
 // Central registry of available grammars.
 // Each grammar must export a `parse(source) -> IR` function.
 
-#import "plantuml.typ"
 #import "java.typ"
 #import "csharp.typ"
 
 /// Built-in grammars: name → parse function.
 #let builtin-grammars = (
-  plantuml: plantuml.parse,
-  java:     java.parse,
-  csharp:   csharp.parse,
+  java:   java.parse,
+  csharp: csharp.parse,
 )
 
 /// Resolve a grammar by name (string) or accept a custom parse function.

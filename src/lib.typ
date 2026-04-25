@@ -15,7 +15,7 @@
 // =============================================================================
 
 /// Parse source code and render the class diagram.
-#let _render-diagram(source, grammar: "plantuml", theme: auto, spacing: (x: 4.0, y: 3.5), fit: true) = {
+#let _render-diagram(source, grammar: "java", theme: auto, spacing: (x: 4.0, y: 3.5), fit: true) = {
   let diagram-ir = parser.parse(source, grammar: grammar)
   let result = renderer.render(diagram-ir, theme: theme, spacing: spacing)
   if fit {
@@ -47,7 +47,7 @@
 ///
 /// Then use code fences:
 /// ````
-/// ```class-diagram-plantuml
+/// ```class-diagram-java
 /// class Foo { ... }
 /// ```
 /// ````
@@ -57,9 +57,6 @@
   fit: true,
   doc,
 ) = {
-  show raw.where(lang: "class-diagram-plantuml"): it => {
-    _render-diagram(it.text, grammar: "plantuml", theme: theme, spacing: spacing, fit: fit)
-  }
   show raw.where(lang: "class-diagram-java"): it => {
     _render-diagram(it.text, grammar: "java", theme: theme, spacing: spacing, fit: fit)
   }
@@ -76,12 +73,12 @@
 /// Render a class diagram from source code.
 ///
 /// - source (str): Source text in the specified grammar
-/// - grammar (str or function): Grammar name ("plantuml", "java", "csharp") or custom parse function
+/// - grammar (str or function): Grammar name ("java", "csharp") or custom parse function
 /// - theme (dict): Theme override (default: built-in theme)
 /// - spacing (dict): (x, y) spacing between classes
 #let class-diagram(
   source,
-  grammar: "plantuml",
+  grammar: "java",
   theme: auto,
   spacing: (x: 4.0, y: 3.5),
   fit: true,
