@@ -10,6 +10,14 @@
 
 ```class-diagram-csharp
 
+public enum Porte
+{
+    Pequeno,
+    Medio,
+    Grande
+}
+
+
 public interface IInterface1
 {
     void Method1();

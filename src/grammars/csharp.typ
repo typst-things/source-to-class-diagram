@@ -192,11 +192,18 @@
             }
           }
         } else {
-          // ── Field or Property ──────────────────────────────────────────────
+          // ── Field, Property or Enum constant ────────────────────────────
           // Strip initialiser, accessor block, and semicolon
           if rest.contains("=")  { rest = rest.split("=").at(0).trim() }
           if rest.contains("{")  { rest = rest.split("{").at(0).trim() }
           if rest.ends-with(";") { rest = rest.slice(0, rest.len() - 1).trim() }
+
+          // Enum constants: strip trailing comma and optional constructor args
+          if current-class.type == "enum" {
+            if rest.ends-with(",") { rest = rest.slice(0, rest.len() - 1).trim() }
+            let paren-idx = rest.position("(")
+            if paren-idx != none { rest = rest.slice(0, paren-idx).trim() }
+          }
 
           let parts = rest.split(regex("\\s+"))
           if parts.len() >= 2 {
@@ -223,6 +230,15 @@
               return-type: return-type,
               visibility:  visibility,
               modifiers:   modifiers,
+              kind:        "field",
+            ))
+          } else if parts.len() == 1 and current-class.type == "enum" and parts.at(0) != "" {
+            // Enum constant: single identifier with no type (e.g. Pequeno, Medio)
+            current-members.push(ir.uml-member(
+              name:        parts.at(0),
+              return-type: none,
+              visibility:  "public",
+              modifiers:   (),
               kind:        "field",
             ))
           }

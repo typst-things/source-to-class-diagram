@@ -25,6 +25,13 @@
 = Teste Gramática: Java
 
 ```class-diagram-java
+
+enum Porte {
+  PEQUENO,
+  MEDIO,
+  GRANDE
+}
+
 interface Interface1{
  void method1();
 }
