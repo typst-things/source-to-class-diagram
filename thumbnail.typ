@@ -8,6 +8,12 @@
 = Teste Gramática: Java
 
 ````typ
+
+#import "@preview/source-to-class-diagram:0.1.0": setup-classuml
+
+#show: setup-classuml
+
+
 ```class-diagram-java
 class Departamento{
   private String nome;
