@@ -2,7 +2,7 @@
 // source-to-class-diagram — Manual
 // =============================================================================
 
-#import "src/lib.typ": class-diagram, setup-classuml
+#import "../src/lib.typ": class-diagram, setup-classuml
 
 #set page(paper: "a4", margin: (x: 2cm, y: 2.5cm))
 #set text(font: "Segoe UI", size: 11pt)
