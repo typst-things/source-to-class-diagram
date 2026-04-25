@@ -143,23 +143,70 @@
     level-groups.at(str(level)).push(cls.name)
   }
 
-  // --- 5. Compute positions ---
+  // --- 5. Compute positions using Tree layout ---
   let positions = (:)
 
-  for level-idx in range(max-level + 1) {
-    let key = str(level-idx)
-    let group = level-groups.at(key, default: ())
-    let count = group.len()
-    if count == 0 { continue }
+  // Build strict tree
+  let strict-children = (:)
+  for cls in classes { strict-children.insert(cls.name, ()) }
 
-    // Center the group horizontally
-    let total-width = (count - 1) * actual-sx
-    let start-x = -total-width / 2
+  for cls in classes {
+    let p = parent-map.at(cls.name, default: ())
+    let cur-level = levels.at(cls.name, default: 0)
+    let valid-p = p.filter(x => levels.at(x, default: -1) == cur-level - 1)
+    if cur-level > 0 and valid-p.len() > 0 {
+      strict-children.at(valid-p.first()).push(cls.name)
+    }
+  }
 
-    for (col, name) in group.enumerate() {
-      let x = start-x + col * actual-sx
-      let y = -level-idx * actual-sy
-      positions.insert(name, (x, y))
+  // Bottom-up pass for subtree widths
+  let subtree-width = (:)
+  
+  for level-idx in range(max-level, -1, step: -1) {
+    let group = level-groups.at(str(level-idx), default: ())
+    for name in group {
+      let kids = strict-children.at(name, default: ())
+      if kids.len() == 0 {
+        subtree-width.insert(name, actual-sx)
+      } else {
+        let w = 0.0
+        for k in kids { w += subtree-width.at(k, default: actual-sx) }
+        subtree-width.insert(name, calc.max(actual-sx, w))
+      }
+    }
+  }
+
+  // Top-down pass for coordinate assignment
+  let root-group = level-groups.at("0", default: ())
+  let root-total-width = 0.0
+  for r in root-group { root-total-width += subtree-width.at(r, default: actual-sx) }
+
+  let current-x = -root-total-width / 2
+
+  for r in root-group {
+    let w = subtree-width.at(r, default: actual-sx)
+    positions.insert(r, (current-x + w / 2, 0.0))
+    current-x += w
+  }
+
+  for level-idx in range(1, max-level + 1) {
+    let parent-group = level-groups.at(str(level-idx - 1), default: ())
+    for name in parent-group {
+      let kids = strict-children.at(name, default: ())
+      if kids.len() > 0 {
+        let parent-x = positions.at(name).at(0)
+        let total-kid-w = 0.0
+        for k in kids { total-kid-w += subtree-width.at(k, default: actual-sx) }
+        
+        let kid-start-x = parent-x - total-kid-w / 2
+        for k in kids {
+          let kw = subtree-width.at(k, default: actual-sx)
+          let kx = kid-start-x + kw / 2
+          let ky = -level-idx * actual-sy
+          positions.insert(k, (kx, ky))
+          kid-start-x += kw
+        }
+      }
     }
   }
 

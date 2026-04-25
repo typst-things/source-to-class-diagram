@@ -40,7 +40,7 @@
       if rel.from in positions and rel.to in positions {
         let from-pos = positions.at(rel.from)
         let to-pos = positions.at(rel.to)
-        relations.draw-relation(rel, from-pos, to-pos, the-theme, positions)
+        relations.draw-relation(rel, from-pos, to-pos, the-theme, positions, all-relations: ir.relations)
       }
     }
   })
