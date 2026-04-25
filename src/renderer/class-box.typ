@@ -12,6 +12,9 @@
 /// - theme (dict): The active theme
 #let _render-member(member, theme) = {
   let vis-sym = theme.visibility-symbols.at(member.visibility, default: "~")
+  if type(vis-sym) == dictionary {
+    vis-sym = vis-sym.at(member.kind, default: "~")
+  }
   let vis-col = theme.visibility-colors.at(member.visibility, default: rgb("#666"))
 
   // Build the text content

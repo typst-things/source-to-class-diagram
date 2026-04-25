@@ -25,6 +25,20 @@
 = Teste Gramática: Java
 
 ```class-diagram-java
+interface Interface1{
+ void method1();
+}
+
+class MiniTeste implements Interface1{
+  public void method1(){
+
+  }
+
+  private void method2(){
+
+  }
+}
+
 class Class1 {
   private List<Class2> listClass2;
   public addClass2(String class2Name){
@@ -51,7 +65,7 @@ class Class4 extends Class1{
 }
 
 @Layout(level=1, order=1)
-class Class3 {
+class Class3 implements Interface1{
   private Class1 class1;
 }
 

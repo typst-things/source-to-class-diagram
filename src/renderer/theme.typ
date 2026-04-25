@@ -34,10 +34,10 @@
   ),
   // Visibility display symbols (shown in the diagram)
   visibility-symbols: (
-    public:    "+",
-    private:   "-",
-    protected: "#",
-    package:   "~",
+    public:    (field: "○", method: "●"),
+    private:   (field: "□", method: "■"),
+    protected: (field: "◇", method: "◆"),
+    package:   (field: "△", method: "▲"),
   ),
   // Relation styles
   relation: (

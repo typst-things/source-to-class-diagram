@@ -66,7 +66,7 @@
       } else if depth-before == 1 {
         // Parse Member (Field or Method or Constructor or Property)
         let rest = line
-        let visibility = "package"
+        let visibility = if current-class.type == "interface" { "public" } else { "package" }
         
         let vis-match = rest.match(regex("^(public|private|protected|internal)\\s+"))
         if vis-match != none {
@@ -125,7 +125,8 @@
                       relations.push(ir.uml-relation(
                         from: current-class.name,
                         to: type-name,
-                        type: "aggregation"
+                        type: "aggregation",
+                        label: if p-words.len() > 1 { p-words.at(1) } else { none }
                       ))
                     }
                   }
@@ -178,7 +179,8 @@
                 relations.push(ir.uml-relation(
                   from: current-class.name,
                   to: clean-type,
-                  type: "association"
+                  type: "association",
+                  label: name
                 ))
             }
 
