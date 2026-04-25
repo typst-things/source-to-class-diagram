@@ -41,12 +41,16 @@
   stereotype: none,
   members: (),
   generics: none,
+  level: none,
+  order: none,
 ) = (
   name: name,
   type: type,
   stereotype: stereotype,
   members: members,
   generics: generics,
+  level: level,
+  order: order,
 )
 
 /// Creates a UML relation between two classes.

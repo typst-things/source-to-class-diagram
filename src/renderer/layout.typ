@@ -112,6 +112,11 @@
     if cls.name not in levels { levels.insert(cls.name, 0) }
   }
 
+  // Override computed levels with layout annotations
+  for cls in classes {
+    if cls.level != none { levels.insert(cls.name, cls.level) }
+  }
+
   // --- 3. Estimate sizes and compute spacing ---
   let max-width = 2.5
   let max-height = 1.5
@@ -143,68 +148,105 @@
     level-groups.at(str(level)).push(cls.name)
   }
 
-  // --- 5. Compute positions using Tree layout ---
-  let positions = (:)
+  // --- 5. Compute positions using Grid-Cell layout ---
+  let col-map = (:)
+  let root-counter = 0
 
-  // Build strict tree
-  let strict-children = (:)
-  for cls in classes { strict-children.insert(cls.name, ()) }
-
+  // 5.1 Assign roots and explicit columns
   for cls in classes {
-    let p = parent-map.at(cls.name, default: ())
-    let cur-level = levels.at(cls.name, default: 0)
-    let valid-p = p.filter(x => levels.at(x, default: -1) == cur-level - 1)
-    if cur-level > 0 and valid-p.len() > 0 {
-      strict-children.at(valid-p.first()).push(cls.name)
-    }
-  }
-
-  // Bottom-up pass for subtree widths
-  let subtree-width = (:)
-  
-  for level-idx in range(max-level, -1, step: -1) {
-    let group = level-groups.at(str(level-idx), default: ())
-    for name in group {
-      let kids = strict-children.at(name, default: ())
-      if kids.len() == 0 {
-        subtree-width.insert(name, actual-sx)
-      } else {
-        let w = 0.0
-        for k in kids { w += subtree-width.at(k, default: actual-sx) }
-        subtree-width.insert(name, calc.max(actual-sx, w))
+    if cls.order != none {
+      col-map.insert(cls.name, cls.order)
+    } else {
+      let p = parent-map.at(cls.name, default: ())
+      if p.len() == 0 {
+        col-map.insert(cls.name, root-counter)
+        root-counter += 1
       }
     }
   }
 
-  // Top-down pass for coordinate assignment
-  let root-group = level-groups.at("0", default: ())
-  let root-total-width = 0.0
-  for r in root-group { root-total-width += subtree-width.at(r, default: actual-sx) }
-
-  let current-x = -root-total-width / 2
-
-  for r in root-group {
-    let w = subtree-width.at(r, default: actual-sx)
-    positions.insert(r, (current-x + w / 2, 0.0))
-    current-x += w
+  // 5.2 Assign children to their parent's column
+  for level-idx in range(1, max-level + 1) {
+    for cls in classes {
+      if levels.at(cls.name, default: 0) == level-idx and cls.name not in col-map {
+        let p = parent-map.at(cls.name, default: ())
+        let valid-p = p.filter(x => levels.at(x, default: -1) < level-idx)
+        if valid-p.len() > 0 {
+          let best-p = valid-p.sorted(key: x => -levels.at(x, default: -1)).first()
+          let parent-col = col-map.at(best-p, default: 0)
+          col-map.insert(cls.name, parent-col)
+        } else {
+          col-map.insert(cls.name, root-counter)
+          root-counter += 1
+        }
+      }
+    }
   }
 
-  for level-idx in range(1, max-level + 1) {
-    let parent-group = level-groups.at(str(level-idx - 1), default: ())
-    for name in parent-group {
-      let kids = strict-children.at(name, default: ())
-      if kids.len() > 0 {
-        let parent-x = positions.at(name).at(0)
-        let total-kid-w = 0.0
-        for k in kids { total-kid-w += subtree-width.at(k, default: actual-sx) }
+  // 5.3 Group classes into grid cells
+  let cells = (:) // (col, level) -> [class_names]
+  let sizes = (:)
+  for cls in classes {
+    sizes.insert(cls.name, (w: _estimate-width(cls), h: _estimate-height(cls)))
+    
+    let c = col-map.at(cls.name, default: 0)
+    let l = levels.at(cls.name, default: 0)
+    let key = str(c) + "," + str(l)
+    if key not in cells { cells.insert(key, ()) }
+    cells.at(key).push(cls.name)
+  }
+
+  // 5.4 Compute cell and column widths
+  let cell-width = (:)
+  let all-cols = col-map.values().dedup().sorted()
+  let col-max-width = (:)
+  
+  for c in all-cols {
+    let max-w = 0.0
+    for level-idx in range(max-level + 1) {
+      let key = str(c) + "," + str(level-idx)
+      let members = cells.at(key, default: ())
+      let cw = 0.0
+      if members.len() > 0 {
+        for m in members { cw += sizes.at(m).w }
+        cw += (members.len() - 1) * 1.5 // Internal padding between cell siblings
+      }
+      cell-width.insert(key, calc.max(cw, 2.0))
+      if cw > max-w { max-w = cw }
+    }
+    col-max-width.insert(str(c), max-w)
+  }
+
+  // 5.5 Map global column X centers
+  let col-centers = (:)
+  let total-grid-w = 0.0
+  for c in all-cols { total-grid-w += col-max-width.at(str(c)) }
+  total-grid-w += calc.max(all-cols.len() - 1, 0) * gap-x
+
+  let current-x = -total-grid-w / 2
+  for c in all-cols {
+    let cw = col-max-width.at(str(c))
+    col-centers.insert(str(c), current-x + cw / 2)
+    current-x += cw + gap-x
+  }
+
+  // 5.6 Distribute coordinates
+  let positions = (:)
+  for level-idx in range(max-level + 1) {
+    for c in all-cols {
+      let key = str(c) + "," + str(level-idx)
+      let members = cells.at(key, default: ())
+      if members.len() > 0 {
+        let center-x = col-centers.at(str(c))
+        let cw = cell-width.at(key)
+        let start-x = center-x - cw / 2
         
-        let kid-start-x = parent-x - total-kid-w / 2
-        for k in kids {
-          let kw = subtree-width.at(k, default: actual-sx)
-          let kx = kid-start-x + kw / 2
+        for m in members {
+          let mw = sizes.at(m).w
+          let kx = start-x + mw / 2
           let ky = -level-idx * actual-sy
-          positions.insert(k, (kx, ky))
-          kid-start-x += kw
+          positions.insert(m, (kx, ky))
+          start-x += mw + 1.5
         }
       }
     }

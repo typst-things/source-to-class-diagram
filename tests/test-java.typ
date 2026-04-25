@@ -46,13 +46,25 @@ class Class2{
     this.class1 = class1;
   }
 }
+class Class4 extends Class1{
+  public String teste;
+}
 
-class Class3{
+@Layout(level=1, order=1)
+class Class3 {
   private Class1 class1;
 }
 
 class Class4 extends Class1{
+  public String teste;
+}
 
+class Class5 extends Class1{
+  public String teste;
+}
+
+class Class6 extends Class1{
+  public String teste;
 }
 
 

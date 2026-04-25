@@ -15,6 +15,9 @@
   let current-class = none
   let current-members = ()
   let brace-depth = 0
+  
+  let layout-level = none
+  let layout-order = none
 
   for raw-line in lines {
     let line = raw-line.trim()
@@ -193,6 +196,16 @@
     }
 
     // --- Outside class body ---
+    let layout-match = line.match(regex("^@Layout\\s*\\((.*)\\)"))
+    if layout-match != none {
+      let params = layout-match.captures.at(0)
+      let level-m = params.match(regex("level\\s*=\\s*(\\d+)"))
+      let order-m = params.match(regex("order\\s*=\\s*(\\d+)"))
+      if level-m != none { layout-level = int(level-m.captures.at(0)) }
+      if order-m != none { layout-order = int(order-m.captures.at(0)) }
+      continue
+    }
+
     let m = line.match(regex("^(?:(public|protected|private|package)\\s+)?(?:(abstract)\\s+)?(class|interface|enum|@interface)\\s+([A-Z][\\w.]*)"))
     if m != none {
       let is-abstract = m.captures.at(1) != none
@@ -202,9 +215,11 @@
 
       let is-opening = line.contains("{")
 
-      let cls = ir.uml-class(name: name, type: cls-type)
+      let cls = ir.uml-class(name: name, type: cls-type, level: layout-level, order: layout-order)
       current-class = cls
       current-members = ()
+      layout-level = none
+      layout-order = none
 
       // Parse extends and implements
       let after-name = line.slice(m.end)
