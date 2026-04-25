@@ -2,7 +2,7 @@
 // source-to-class-diagram — Manual
 // =============================================================================
 
-#import "../src/lib.typ": class-diagram, setup-classuml
+#import "src/lib.typ": class-diagram, setup-classuml
 
 #set page(paper: "a4", margin: (x: 2cm, y: 2.5cm))
 #set text(font: "Segoe UI", size: 11pt)
@@ -67,8 +67,9 @@ específica. O pacote:
 
 Copie a pasta `src/` do pacote para o seu projeto e importe `lib.typ`:
 
+
 ```typst
-#import "src/lib.typ": setup-classuml, class-diagram
+#import "@preview/source-to-class-diagram:0.1.0": setup-classuml, class-diagram
 ```
 
 // ===========================================================================
@@ -82,7 +83,7 @@ em documentos onde você quer mostrar exemplos de código sem renderizá-los —
 prefira a função direta nesses casos.*
 
 ```typst
-#import "src/lib.typ": setup-classuml
+#import "@preview/source-to-class-diagram:0.1.0": setup-classuml
 #show: setup-classuml
 ```
 
@@ -133,7 +134,7 @@ class Foo {}
 Use a função diretamente para controlar parâmetros por diagrama:
 
 ```typst
-#import "src/lib.typ": class-diagram
+#import "@preview/source-to-class-diagram:0.1.0": class-diagram
 
 #class-diagram(
   "class Foo { private Bar bar; }",
@@ -181,7 +182,7 @@ Em vez de colar código dentro do documento Typst, leia os arquivos `.java`
 ou `.cs` diretamente com `read()`:
 
 ```typst
-#import "src/lib.typ": class-diagram
+#import "@preview/source-to-class-diagram:0.1.0": class-diagram
 
 #let src = (
   read("src/model/Animal.java"),

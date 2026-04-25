@@ -1,2 +1,0 @@
-#let f = [ #sym.square.filled ]
-#f
